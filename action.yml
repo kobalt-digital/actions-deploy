@@ -22,9 +22,6 @@ inputs:
     owner:
         description: 'Deploy owner'
         required: true
-    ssh_file:
-        description: 'SSH key file'
-        required: true
 
 runs:
     using: 'docker'
@@ -35,7 +32,6 @@ runs:
         -   ${{ inputs.port }}
         -   ${{ inputs.path }}
         -   ${{ inputs.owner }}
-        -   ${{ inputs.ssh_file }}
 
 
 
