@@ -5,6 +5,7 @@ SSH_HOST=$2
 SSH_PORT=$3
 PATH_SOURCE=$4
 OWNER=$5
+SSH_FILE=$6
 
 mkdir -p /root/.ssh
 ssh-keyscan -H "$SSH_HOST" >> /root/.ssh/known_hosts
@@ -14,8 +15,8 @@ then
 	echo $'\n' "------ DEPLOY KEY NOT SET YET! ----------------" $'\n'
 	exit 1
 else
-	printf '%b\n' "$DEPLOY_KEY" > /root/.ssh/id_rsa
-	chmod 400 /root/.ssh/id_rsa
+	printf '%b\n' "$DEPLOY_KEY" > /root/.ssh/$SSH_FILE
+	chmod 400 /root/.ssh/$SSH_FILE
 
 	echo $'\n' "------ CONFIG SUCCESSFUL! ---------------------" $'\n'
 fi
@@ -26,17 +27,21 @@ then
 	ssh-keyscan -p $SSH_PORT -H "$SSH_HOST" >> /root/.ssh/known_hosts
 fi
 
-rsync --progress -avzh \
-	--exclude='.git/' \
-	--exclude='.git*' \
-	--exclude='.editorconfig' \
-	--exclude='.styleci.yml' \
-	--exclude='.idea/' \
-	--exclude='Dockerfile' \
-	--exclude='readme.md' \
-	--exclude='README.md' \
-	-e "ssh -i /root/.ssh/id_rsa" \
-	--rsync-path="sudo rsync" . $SSH_USER@$SSH_HOST:$PATH_SOURCE
+# rsync --progress -avzh \
+# 	--exclude='.git/' \
+
+# 	--exclude='.git*' \
+# 	--exclude='.editorconfig' \
+# 	--exclude='.styleci.yml' \
+# 	--exclude='.idea/' \
+# 	--exclude='Dockerfile' \
+# 	--exclude='readme.md' \
+# 	--exclude='README.md' \
+# 	-e "ssh -i /root/.ssh/id_rsa" \
+# 	--rsync-path="sudo rsync" . $SSH_USER@$SSH_HOST:$PATH_SOURCE
+
+rsync -rvpi --delete --exclude-from '.rsync-excludes' -e "ssh -i /root/.ssh/$SSH_FILE" ./* $SSH_USER@$SSH_HOST:$PATH_SOURCE
+
 
 if [ $? -eq 0 ]
 then
