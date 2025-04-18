@@ -15,7 +15,7 @@ then
 	exit 1
 else
 	printf '%b\n' "$DEPLOY_KEY" > /root/.ssh/id_rsa
-	chmod 400 /root/.ssh/id_rsa
+	chmod 400 /root/.ssh/$SSH_FILE
 
 	echo $'\n' "------ CONFIG SUCCESSFUL! ---------------------" $'\n'
 fi
@@ -30,7 +30,6 @@ rsync -rvpi \
 	--delete \
 	--exclude='.git/' \
 	--exclude-from '.rsync-excludes' \
-
 	-e "ssh -i /root/.ssh/id_rsa" \
 	--rsync-path="sudo rsync" . $SSH_USER@$SSH_HOST:$PATH_SOURCE
 
